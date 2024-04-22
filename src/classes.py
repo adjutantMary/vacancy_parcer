@@ -4,27 +4,15 @@ import requests, json, os
 from path import JSON_DATA
 
 
-class Vacancy:
-    """
-    Класс для инициализации полей
-    """
-
-    def __init__(self, name, area, url, salary):
-        self.name = name
-        self.area = area
-        self.url = url
-        self.salary = salary
-
-
 class ApiConnector(ApiGetter):
     """Класс для работы с HeadHunter"""
 
-    def __init__(self, area=113, page=0, in_page=1):
+    def __init__(self, area=113, page=0, in_page=10):
         self.area = area
         self.page = page
         self.in_page = in_page
 
-    def _get_vacancies(self, vacancy_name: str, api_url="https://api.hh.ru/vacancies") -> list[dict]:
+    def get_vacancies(self, vacancy_name: str, api_url="https://api.hh.ru/vacancies") -> list[dict]:
         """
         Метод получает вакансии по API и сохраняет их в виде JSON - списка
         :param vacancy_name:название вакансии
@@ -71,6 +59,28 @@ class ApiConnector(ApiGetter):
             vacancies.append(info)
         return vacancies
 
+    @staticmethod
+    def filter_by_description(users_vacancies: list[dict], search_param: list):
+        filtered_vacancies = []
+
+        for item in users_vacancies:
+            for param in search_param:
+                if param in item['snippet']['requirement']:
+                    filtered_vacancies.append(item)
+                    break
+        return filtered_vacancies
+
+    @staticmethod
+    def get_vacancies_by_salary(filtered_vacancies: list[dict], salary_from: int) -> list:
+        sorted_by_salary = []
+
+        for item in filtered_vacancies:
+            if item['salary'] is not None:
+                if salary_from <= item['salary']['from']:
+                    sorted_by_salary.append(item)
+
+        return sorted_by_salary
+
 
 class Save(Saving):
     """запись файла в json"""
@@ -82,7 +92,7 @@ class Save(Saving):
         """
         self.file = os.path.join(JSON_DATA, file)
 
-    def save_vacancies_to_json(self, vacancies: dict):
+    def save_vacancies_to_json(self, vacancies):
         """
         Метод класса, который сохраняет полученные вакансии в JSON файл
         :param vacancies: список вакансий
@@ -100,7 +110,6 @@ class Save(Saving):
             try:
                 with open("vacancies.json", "w+") as file:
                     json.dump(vacancies, file, ensure_ascii=False, indent=2)
-                    return file
             except Exception as error:
                 print(f"Ошибка {error}: не удалось сохранить данные в файл")
 
@@ -127,11 +136,6 @@ class Save(Saving):
                 if item["salary_from"] != 0 or item["salary_to"] != 0:
                     sorted_vacancies = self.save_vacancies_to_json(item)
                     print(f'Отсортированные вакансии по зарплате: {sorted_vacancies}')
+                    return sorted_vacancies
         except Exception as er:
             print(f"Обнаружена ошибка {er} при сортировке вакансий")
-
-
-if __name__ == "__main__":
-    try_1 = ApiConnector()
-    vacancies = try_1._get_vacancies('Python')
-    print(try_1.fetch_data(vacancies))
