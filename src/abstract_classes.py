@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class ApiGetter(ABC):
 
     @abstractmethod
-    def _get_vacancies(self, vacancy_name: str, api_url: str) -> list:
+    def get_vacancies(self, vacancy_name: str, api_url: str) -> list:
         """
         Класс принимает api адрес вакансий
         :param api_url:
@@ -22,10 +22,9 @@ class Saving(ABC):
     """Абстрактный класс для работы с JSON файлом"""
 
     @abstractmethod
-    def save_vacancies_to_json(self, vacancies: list):
+    def save_vacancies_to_json(self, vacancies):
         """
         Метод загружает вакансии и сохраняет в формате JSON
-        :param vacancies: список вакансий
         :return: JSON файл
         """
         pass
