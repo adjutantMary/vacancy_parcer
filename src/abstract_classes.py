@@ -14,7 +14,7 @@ class ApiGetter(ABC):
 
     @staticmethod
     @abstractmethod
-    def fetch_data(data):
+    def fetch_data(data: list):
         pass
 
 
@@ -22,7 +22,7 @@ class Saving(ABC):
     """Абстрактный класс для работы с JSON файлом"""
 
     @abstractmethod
-    def save_vacancies_to_json(self, vacancies):
+    def save_vacancies_to_json(self, vacancies: list):
         """
         Метод загружает вакансии и сохраняет в формате JSON
         :return: JSON файл
