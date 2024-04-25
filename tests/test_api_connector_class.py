@@ -27,9 +27,19 @@ def test_api_error():
 
 def test_fetch_data(vacancies_list):
     """Метод проверяет корректность сформированного списка fetch_data"""
-    cls_obj = ApiConnector(area=2, in_page=1)
-    vacancies = cls_obj.get_vacancies("Python", "https://api.hh.ru/vacancies")
-    assert cls_obj.fetch_data(vacancies) == vacancies_list
+    cls_obj = ApiConnector()
+    input_data = [{"name": "Junior Python Developer", "salary": None, "snippet": {"requirement": ""}}]
+    expected_output = [
+        {
+            "url": "https://hh.ru/vacancy/None",
+            "Зарплата до": 0,
+            "Зарплата от": 0,
+            "Название вакансии": "Junior Python Developer",
+            "Описание": "",
+            "Регион": None,
+        }
+    ]
+    assert cls_obj.fetch_data(input_data) == expected_output
 
 
 def test_empty_list():
